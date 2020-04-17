@@ -157,15 +157,32 @@ def extract_table(pdf_path, area, page=None, recompute_derived_cols=True) -> pd.
     df = tables[0]
 
     # Sanity checks
-    if len(df) != 12:
-        raise TableExtractionError('unexpected table length: %s' % list(df.age_group))
+    if len(df) == 12:
+        pass
+    elif (
+        # In report of 2020-03-2020 the age_group "Non nota" (unknown) is "Età non nota"
+        # and is written in 2 lines; this confounds tabula, which sees 3 rows instead of 1.
+        len(df) == 14
+        and df.iloc[10, 0].strip().lower() == 'età non'   # row of NaNs
+        and df.iloc[11, 0].strip() == ''                  # row containing values
+        and df.iloc[12, 0].strip().lower() == 'nota'      # row of NaNs
+    ):
+        df.iloc[10, :] = df.iloc[11, :]
+        df.drop(index=[11, 12], inplace=True)
+        # int columns are float because of NaNs in this case; let's convert them to int
+        int_columns =  cartesian_join(INPUT_COLUMN_GROUPS, ['cases', 'deaths'])
+        df = df.astype({col: int for col in int_columns})
+    else:
+        raise TableExtractionError(
+            'unexpected table length: %d. Expected: %d\n'
+            'Age groups: %s' % (len(df.age_group), 12, list(df.age_group)))
 
     # Replace '≥90' with ascii equivalent '>=90'
     df.at[9, 'age_group'] = '>=90'
     # Replace 'non nota' with english translation
     df.at[10, 'age_group'] = 'unknown'
 
-    # Extract row containing totals
+# Extract row containing totals
     total = df.iloc[11]
     df = df.iloc[:11].copy()
 
