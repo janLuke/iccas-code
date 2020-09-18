@@ -38,7 +38,7 @@ def _iss_report_filename_date_parser():
     date_pattern = re.compile(
         reagex(
             r'{day}{_sep}{month}{_sep}{year}',
-            day='\d{1,2}', year='\d{4}',
+            day=r'\d{1,2}', year=r'\d{4}',
             month='|'.join(italian_months),
             _sep='[-_ ]'),
         re.IGNORECASE)

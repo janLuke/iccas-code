@@ -15,7 +15,7 @@ DATE_DATASET_FNAME = 'iccas_{date}'
 FULL_DATASET_DIR = DATA_DIR
 FULL_DATASET_FNAME = 'iccas_full'
 
-_DATE_PATTERN = re.compile('(\d{4}-\d{2}-\d{2})')
+_DATE_PATTERN = re.compile(r'(\d{4}-\d{2}-\d{2})')
 
 
 def get_date_from_filename(fname):
