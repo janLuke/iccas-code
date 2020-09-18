@@ -50,14 +50,14 @@ def load_tabula_templates(dirpath=TABULA_TEMPLATES_DIR):
 
 
 def _tabula_template_getter(template_dir=TABULA_TEMPLATES_DIR):
-    TEMPLATE_BY_DATE = load_tabula_templates(template_dir)
-    DATES = sorted(TEMPLATE_BY_DATE.keys())   # dates of first validity of the templates
+    template_by_date = load_tabula_templates(template_dir)
+    dates = sorted(template_by_date.keys())  # dates of first validity of the templates
 
     def get_tabula_template(report_date):
         """ Returns the tabula template to use given the report date """
-        i = bisect(DATES, report_date)  # index of 1st date >= report_date
-        template_date = DATES[i - 1]
-        return TEMPLATE_BY_DATE[template_date]
+        i = bisect(dates, report_date)  # index of 1st date >= report_date
+        template_date = dates[i - 1]
+        return template_by_date[template_date]
 
     return get_tabula_template
 
@@ -70,12 +70,14 @@ def area_from_template(template):
 
 
 def to_int(s):
-    if not s: return math.nan
+    if not s:
+        return math.nan
     return int(s.replace('.', '').replace(' ', ''))
 
 
 def to_float(s):  # can't rely on pandas since ISS number notation is inconsistent
-    if not s: return math.nan
+    if not s:
+        return math.nan
     return float(s.replace(',', '.'))
 
 
@@ -89,7 +91,7 @@ INPUT_COLUMN_GROUPS = ('male_', 'female_', '')
 INPUT_COLUMN_FIELDS = ('cases', 'cases_percentage', 'deaths', 'deaths_percentage', 'fatality_rate')
 INPUT_COLUMNS = ('age_group', *cartesian_join(INPUT_COLUMN_GROUPS, INPUT_COLUMN_FIELDS))
 INPUT_COLUMN_CONVERTERS = dict(zip(INPUT_COLUMNS,
-    [str] + 3 * [to_int, to_float, to_int, to_float, to_float]))  # noqa
+                                   [str] + 3 * [to_int, to_float, to_int, to_float, to_float]))  # noqa
 
 
 def find_table_page(pdf_path) -> Optional[int]:
@@ -99,11 +101,11 @@ def find_table_page(pdf_path) -> Optional[int]:
     pdf = PyPDF3.PdfFileReader(str(pdf_path))
     num_pages = pdf.getNumPages()
 
-    for i in range(1, num_pages):
+    for i in range(1, num_pages):  # skip the first page, the table is certainly not there
         page = pdf.getPage(i)
         text = ''.join(page.extractText().split('\n'))
         if TABLE_CAPTION_PATTERN.search(text):
-            return i + 1
+            return i + 1  # return a 1-based index
     return None
 
 
@@ -163,14 +165,14 @@ def extract_table(pdf_path, area, page=None, recompute_derived_cols=True) -> pd.
         # In report of 2020-03-2020 the age_group "Non nota" (unknown) is "Età non nota"
         # and is written in 2 lines; this confounds tabula, which sees 3 rows instead of 1.
         len(df) == 14
-        and df.iloc[10, 0].strip().lower() == 'età non'   # row of NaNs
-        and df.iloc[11, 0].strip() == ''                  # row containing values
-        and df.iloc[12, 0].strip().lower() == 'nota'      # row of NaNs
+        and df.iloc[10, 0].strip().lower() == 'età non'  # row of NaNs
+        and df.iloc[11, 0].strip() == ''                 # row containing values
+        and df.iloc[12, 0].strip().lower() == 'nota'     # row of NaNs
     ):
         df.iloc[10, :] = df.iloc[11, :]
         df.drop(index=[11, 12], inplace=True)
         # int columns are float because of NaNs in this case; let's convert them to int
-        int_columns =  cartesian_join(INPUT_COLUMN_GROUPS, ['cases', 'deaths'])
+        int_columns = cartesian_join(INPUT_COLUMN_GROUPS, ['cases', 'deaths'])
         df = df.astype({col: int for col in int_columns})
     else:
         raise TableExtractionError(
@@ -182,7 +184,7 @@ def extract_table(pdf_path, area, page=None, recompute_derived_cols=True) -> pd.
     # Replace 'non nota' with english translation
     df.at[10, 'age_group'] = 'unknown'
 
-# Extract row containing totals
+    # Extract row containing totals
     total = df.iloc[11]
     df = df.iloc[:11].copy()
 
@@ -245,7 +247,7 @@ def make_full_dataset(input_dir=DATA_BY_DATE_DIR,
         iccas_by_date[date] = pd.read_csv(path, index_col='age_group')
 
     full = pd.concat(iccas_by_date.values(), axis=0,
-        keys=iccas_by_date.keys(), names=['date', 'age_group'])
+                     keys=iccas_by_date.keys(), names=['date', 'age_group'])
 
     output_dir.mkdir(parents=True, exist_ok=True)
     full.to_csv(out_path)
