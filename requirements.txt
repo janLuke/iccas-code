@@ -5,3 +5,5 @@ reagex
 pandas==1.0.*
 tabula-py==2.1.0
 requests
+PyPDF3
+GitPython
