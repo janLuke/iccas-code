@@ -34,7 +34,7 @@ COMMIT_TEMPLATE = '[iccas-bot] Update ({date})'
 
 
 class EmailSender:
-    """ Wrapper of smtlib.SMTP for sending authenticated emails (bye default using GMail) """
+    """ Wrapper of smtplib.SMTP for sending authenticated emails (bye default using GMail) """
     def __init__(self, email, password, host='smtp.gmail.com', port=587):
         self.email = email
         self.password = password
@@ -141,8 +141,6 @@ def main(branch='master', push=False, emails_to_notify=[]):
         raise
     finally:
         email_sender.quit()
-
-    sys.exit(1)
 
 
 if __name__ == '__main__':
