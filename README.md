@@ -17,3 +17,15 @@ contained in `download_reports.py`.
 - `update_dataset.py`: script meant to be run in a cronjob for automatically 
 creating and deploying new datasets when a new report is published; it notifies
 me (via emails) in case of errors or success. 
+
+
+## Installation (for my future self)
+
+Replace `<user>` with your username:
+
+```shell
+conda create -n iccas python=3
+conda activate iccas
+pip install -r requirements.txt
+python C:\Users\<user>\miniconda3\envs\iccas\Scripts\pywin32_postinstall.py -install
+```
