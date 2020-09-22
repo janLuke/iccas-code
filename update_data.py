@@ -133,8 +133,6 @@ def main(branch='master', push=False, emails_to_notify=[]):
         else:
             notifier.notify('New commit waiting for push', commit_msg)
 
-        sys.exit(0)
-
     except Exception as exc:
         notifier.notify('Fatal error', repr(exc))
         logging.exception('Exception was raised')
