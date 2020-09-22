@@ -30,7 +30,6 @@ def make_single_date_datasets(reports_dir: Path = ISS_REPORTS_DIR,
                               skip_existing=True) -> List[Path]:
     data_dir.mkdir(parents=True, exist_ok=True)
     new_dataset_paths = []
-    errors = []
     relative_paths = sorted(reports_dir.iterdir())
     for relpath in relative_paths:
         path = reports_dir / relpath
@@ -41,18 +40,13 @@ def make_single_date_datasets(reports_dir: Path = ISS_REPORTS_DIR,
             print(f'Dataset for report of {date} already exists')
         else:
             print(f"Making dataset for report of {date} ...")
-            try:
-                table = table_extractor(path, date)
-                table = recompute_derived_columns(table)
-                table.to_csv(out_path, index=False)
-                new_dataset_paths.append(out_path)
-                print('Saved to', out_path)
-            except Exception as exc:
-                errors.append((relpath, exc))
-                print('ERROR:', exc)
+            table = table_extractor(path, date)
+            table = recompute_derived_columns(table)
+            table.to_csv(out_path, index=False)
+            new_dataset_paths.append(out_path)
+            print('Saved to', out_path)
 
     print('\nNew datasets written:', new_dataset_paths, end='\n\n')
-    print('\nErrors:', len(errors))
     return new_dataset_paths
 
 
@@ -87,5 +81,5 @@ if __name__ == '__main__':
     from download_reports import download_missing_reports
 
     download_missing_reports()
-    make_single_date_datasets(table_extractor=PyPDFTableExtractor())
+    make_single_date_datasets()
     make_full_dataset()
