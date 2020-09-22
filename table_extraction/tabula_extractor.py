@@ -13,7 +13,6 @@ from typing import (
 import pandas as pd
 import tabula
 
-from download_reports import get_date_from_report_filename
 from table_extraction.common import (
     TableExtractor,
     find_table_page,

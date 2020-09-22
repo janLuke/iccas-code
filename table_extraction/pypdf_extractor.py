@@ -16,7 +16,7 @@ class PyPDFTableExtractor(TableExtractor):
 
     def extract(self, path, report_date: str) -> pd.DataFrame:
         page, _ = find_table_page(path)
-        # For some reason, the extracted text contains is full of superfluous newlines
+        # For some reason, the extracted text contains a lot of superfluous newlines
         text = page.extractText().replace('\n', '')
         text = self.unknown_age_matcher.sub('unknown', text)
         start = text.find('0-9')
