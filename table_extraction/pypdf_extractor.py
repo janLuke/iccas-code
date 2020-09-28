@@ -21,6 +21,7 @@ class PyPDFTableExtractor(TableExtractor):
         text = self.unknown_age_matcher.sub('unknown', text)
         start = text.find('0-9')
         text = text[start:]
+        text = text.replace(', ', ',')   # from 28/09, they write "1,5" as "1, 5"
         tokens = text.split(' ')
         num_rows = 11
         num_columns = len(COLUMNS)
