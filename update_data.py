@@ -100,9 +100,9 @@ def main(branch='master', push=False, emails_to_notify=[]):
         logging.info('Checking for new reports...')
         new_report_paths = download_missing_reports()
         if not new_report_paths:
-            logging.info('No new reports. Exit.')
-            sys.exit(0)
-        logging.info('New reports found: %s', ', '.join(map(str, new_report_paths)))
+            logging.info('No new reports.')
+        else:
+            logging.info('New reports found: %s', ', '.join(map(str, new_report_paths)))
 
         new_dataset_paths = make_single_date_datasets(skip_existing=True)
         if not new_dataset_paths:
